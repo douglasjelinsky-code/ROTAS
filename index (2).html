@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotas de Segurança Patrimonial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 4px solid #ff6b35;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .controls {
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #e85a2a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(255,107,53,0.4);
+        }
+
+        .btn-secondary {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #3db8af;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(78,205,196,0.4);
+        }
+
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .city-section {
+            margin-bottom: 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .city-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px 25px;
+            font-size: 1.8em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .city-header .city-name {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .city-header .badge {
+            background: #ff6b35;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.5em;
+            font-weight: normal;
+        }
+
+        .route-section {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .route-section:last-child {
+            border-bottom: none;
+        }
+
+        .route-header {
+            background: #f8f9fa;
+            padding: 15px 25px;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .route-header:hover {
+            background: #e9ecef;
+        }
+
+        .route-header .route-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .route-header .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 0.7em;
+            color: #666;
+        }
+
+        .route-content {
+            padding: 20px 25px;
+            background: #fff;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: #34495e;
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .institution-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .link-btn {
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 12px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .link-btn:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        .checkbox-cell {
+            text-align: center;
+        }
+
+        .checkbox-cell input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #2ecc71;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-edit {
+            padding: 6px 12px;
+            background: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .btn-edit:hover {
+            background: #e67e22;
+        }
+
+        .btn-delete {
+            padding: 6px 12px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 0;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5em;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .close:hover {
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            background: #f8f9fa;
+            border-radius: 0 0 15px 15px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .stats-summary {
+            display: flex;
+            gap: 20px;
+            padding: 20px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .stat-box .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-box .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Rotas de Segurança Patrimonial</h1>
+            <div class="subtitle">Sistema de Gestão e Controle de Visitas</div>
+        </div>
+
+        <div class="stats-summary" id="statsSummary">
+            <div class="stat-box">
+                <span class="number" id="totalInstitutions">85</span>
+                <span class="label">Instituições</span>
+            </div>
+            <div class="stat-box">
+                <span class="number" id="totalRoutes">10</span>
+                <span class="label">Rotas</span>
+            </div>
+            <div class="stat-box">
+                <span class="number" id="visitedCount">0</span>
+                <span class="label">Visitadas</span>
+            </div>
+            <div class="stat-box">
+                <span class="number" id="pendingCount">85</span>
+                <span class="label">Pendentes</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="openAddModal('institution')">➕ Nova Instituição</button>
+            <button class="btn btn-secondary" onclick="openAddModal('route')">📍 Nova Rota</button>
+            <button class="btn btn-secondary" onclick="openAddModal('city')">🏙️ Nova Cidade</button>
+            <button class="btn btn-success" onclick="exportData()">💾 Exportar Dados</button>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar instituição, rota ou cidade..." onkeyup="filterTable()">
+            </div>
+        </div>
+
+        <div class="content" id="mainContent">
+            <!-- Conteúdo será gerado dinamicamente -->
+        </div>
+    </div>
+
+    <!-- Modal para Adicionar/Editar -->
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Adicionar Item</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="itemForm">
+                    <div class="form-group">
+                        <label for="citySelect">Cidade:</label>
+                        <select id="citySelect" required>
+                            <option value="">Selecione uma cidade</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="routeSelect">Rota:</label>
+                        <select id="routeSelect" required>
+                            <option value="">Selecione uma rota</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="institutionName">Nome da Instituição:</label>
+                        <input type="text" id="institutionName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="locationLink">Link de Geolocalização:</label>
+                        <input type="url" id="locationLink" placeholder="https://maps.app.goo.gl/..." required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveItem()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Nova Rota -->
+    <div id="routeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nova Rota</h2>
+                <span class="close" onclick="closeRouteModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="routeForm">
+                    <div class="form-group">
+                        <label for="routeCitySelect">Cidade:</label>
+                        <select id="routeCitySelect" required>
+                            <option value="">Selecione uma cidade</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="routeName">Nome da Rota:</label>
+                        <input type="text" id="routeName" placeholder="Ex: ROTA G1 - Centro e Vicinância" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRouteModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveRoute()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Nova Cidade -->
+    <div id="cityModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nova Cidade</h2>
+                <span class="close" onclick="closeCityModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="cityForm">
+                    <div class="form-group">
+                        <label for="cityName">Nome da Cidade:</label>
+                        <input type="text" id="cityName" placeholder="Ex: GUARAMIRIM - SC" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCityModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveCity()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados iniciais
+        let data = {
+            "GUARAMIRIM - SC": {
+                "ROTA G1 - CENTRO E VICINÂNCIA": [
+                    { name: "CEI Paula Feldmann / Santina Schorck", link: "https://maps.app.goo.gl/8kLhZfJ5mP7q5r7w5", visited: false },
+                    { name: "EMEF Pe. Dorvalino Filipi", link: "https://maps.app.goo.gl/3vP8kL9nXqR2mN6v6", visited: false },
+                    { name: "CEI Zilma Flores", link: "https://maps.app.goo.gl/P5mN7jK8vB3tR4e5", visited: false },
+                    { name: "EMEF Urbano Teixeira", link: "https://maps.app.goo.gl/QwE2rT9uYvF6sH7i8", visited: false },
+                    { name: "EMEF Lauro Carneiro", link: "https://maps.app.goo.gl/RtY3sU0vWxG7tJ9k0", visited: false },
+                    { name: "CEI Roseli Ullmann", link: "https://maps.app.goo.gl/SuV4tW1xYzH8uK1l2", visited: false },
+                    { name: "EMEF Pe. Mathias M. Stein", link: "https://maps.app.goo.gl/TvW5uX2yZaI9vL3m4", visited: false },
+                    { name: "CEI Rosa Testoni", link: "https://maps.app.goo.gl/UxY6vZ3zAbJ0wM5n7", visited: false },
+                    { name: "EME e PE Prof Atilano Kruger", link: "https://maps.app.goo.gl/VyA7wB4aBcK1xN8p0", visited: false },
+                    { name: "CEM Prof Gustavo Tank", link: "https://maps.app.goo.gl/WzB8xC5bCdL2yO2q3", visited: false }
+                ],
+                "ROTA G2 - ZONA RURAL NORTE": [
+                    { name: "CEI Joanir DaSilva / EMEF José Dequech", link: "https://maps.app.goo.gl/XaC9yD6cDeM3zP5r6", visited: false },
+                    { name: "EMEF Iaro e Hansch", link: "https://maps.app.goo.gl/YbD0zE7dEfN4aQ8s9", visited: false },
+                    { name: "EMEF e CEI Mamãe Gansa", link: "https://maps.app.goo.gl/ZcE1aF8eFgO5bT2u1", visited: false },
+                    { name: "EMEF Antonio Plácido", link: "https://maps.app.goo.gl/AdF2bG9fGhP6cV4w3", visited: false },
+                    { name: "EMEF Quati", link: "https://maps.app.goo.gl/BeG3cH0gHiQ7dX6y5", visited: false },
+                    { name: "EMEF Prof Isabel L R de Souza", link: "https://maps.app.goo.gl/CfH4dI1hIjR8eZ9a8", visited: false },
+                    { name: "EMEF Alice Olinger Dias", link: "https://maps.app.goo.gl/DgI5eJ2iJkS9fA0bB", visited: false }
+                ],
+                "ROTA G3 - CENTRO EXPANDIDO": [
+                    { name: "SENAI - Guaramirim", link: "https://maps.app.goo.gl/EhJ6fK3jKlT0gC2cD", visited: false },
+                    { name: "EMEF Germano Laffin", link: "https://maps.app.goo.gl/FiK7gL4kLmU1hD4eF", visited: false },
+                    { name: "CEI Maria Domênica Peixer", link: "https://maps.app.goo.gl/GjL8hM5lMnV2iE7gI", visited: false }
+                ],
+                "ROTA G4 - ZONA RIBEIRINHA": [
+                    { name: "EMEF Cantinho da Amizade", link: "https://maps.app.goo.gl/HkM9iN6mNoW3jF9hJ", visited: false },
+                    { name: "CEI Maurita Rosa", link: "https://maps.app.goo.gl/IlN0jO7nOpX4kI1iK", visited: false }
+                ]
+            },
+            "JARAGUÁ DO SUL - SC": {
+                "ROTA J1 - NORTE & NOROESTE": [
+                    { name: "CMEI Wolfgang Weege", link: "https://maps.app.goo.gl/4pQ7rS8tU3vW9xY1z", visited: false },
+                    { name: "EMEB Antônio Estanislau Ayroso", link: "https://maps.app.goo.gl/5qR8sT9uV4wX0yA3b", visited: false },
+                    { name: "CMEI Onelia Muller Erschink", link: "https://maps.app.goo.gl/1wX4yZ5aB0cD6gL7m", visited: false },
+                    { name: "EMEB Guilherme Hanemann", link: "https://maps.app.goo.gl/7sT0uV1wX6yZ2cD8e", visited: false },
+                    { name: "EMEB Helmuth Guilherme Duwe", link: "https://maps.app.goo.gl/8tU1vW2xY7zA3dF0g", visited: false },
+                    { name: "EMEB Profª. Gertrudes S. Milbratz", link: "https://maps.app.goo.gl/6rS9tU0vW5xY1zB5c", visited: false },
+                    { name: "CMEI Rui Kroeger", link: "https://maps.app.goo.gl/9uV2wX3yZ8aB4eH2i", visited: false },
+                    { name: "EMEB Profª. Henrique Heise", link: "https://maps.app.goo.gl/0vW3xY4zA9bC5fJ4k", visited: false },
+                    { name: "EMEB Santo Estevão", link: "https://maps.app.goo.gl/4zA7bC8dE3fG2kR4s", visited: false },
+                    { name: "EMEB Luiz Gonzaga Ayroso", link: "https://maps.app.goo.gl/2xY5zA6bC1dE8hN9o", visited: false },
+                    { name: "CMEI Waldir Edson Theilacker", link: "https://maps.app.goo.gl/3yZ6aB7cD2eF0iP2q", visited: false },
+                    { name: "EMEB Ricieri Marcatto", link: "https://maps.app.goo.gl/NpQ8rT9uV5wX1yC4e", visited: false },
+                    { name: "CMEI Emma Grutzmacher Dallmann", link: "https://maps.app.goo.gl/PqR9sU0vW6xY2aD5f", visited: false },
+                    { name: "EMEB Marcos Emílio Verbinnen", link: "https://maps.app.goo.gl/QrS0tV1wX7yZ3bE6g", visited: false },
+                    { name: "CMEI Estrada Nova", link: "https://maps.app.goo.gl/VwX5yA6bC2dE8gJ1l", visited: false },
+                    { name: "EMEB Padre Alberto Jacobs", link: "https://maps.app.goo.gl/RsT1uW2xY8zA4cF7h", visited: false }
+                ],
+                "ROTA J2 - LESTE & TRÊS RIOS": [
+                    { name: "EMEB Vitor Meirelles", link: "https://maps.app.goo.gl/StU2vX3yZ9aB5dG8i", visited: false },
+                    { name: "CMEI Marcio Nicollini", link: "https://maps.app.goo.gl/WxY6zB7cD3eF9hK2m", visited: false },
+                    { name: "EMEB Profª. Francisco Solamon", link: "https://maps.app.goo.gl/ZaB9cE0fG6hI2kN5p", visited: false },
+                    { name: "CMEI Daniel Carlos Pretti", link: "https://maps.app.goo.gl/EfG4hJ5kL1mN7pS0u", visited: false },
+                    { name: "EMEB Max Schubert", link: "https://maps.app.goo.gl/FgH5iK6lM2nO8qT1v", visited: false },
+                    { name: "CMEI Prof.ª Alvina Karsten Schwedler", link: "https://maps.app.goo.gl/GhI6jL7mN3oP9rU2w", visited: false },
+                    { name: "Pré-Escola Prof. Maria Lucy de Simas", link: "https://maps.app.goo.gl/HiJ7kM8nO4pQ0sV3x", visited: false }
+                ],
+                "ROTA J3 - SUL & INTERIOR SUL": [
+                    { name: "EMEB Joaquim Ferrazza", link: "https://maps.app.goo.gl/TuV3wY4zA0bC6eH9j", visited: false },
+                    { name: "CMEI Gustavo Mathedi", link: "https://maps.app.goo.gl/XyZ7aC8dE4fG0iL3n", visited: false },
+                    { name: "CMEI Maria Mokwa Kitkosky", link: "https://maps.app.goo.gl/YzA8bD9eF5gH1jM4o", visited: false },
+                    { name: "CMEI Almida Dalcanale Bertoli", link: "https://maps.app.goo.gl/UvW4xZ5aB1cD7fI0k", visited: false },
+                    { name: "EMEB Loteamento Amizade", link: "https://maps.app.goo.gl/BcD1eG2hI8jK4mP7r", visited: false },
+                    { name: "CMEI Alexander Enke", link: "https://maps.app.goo.gl/IjK8lN9oP5qR1tW4y", visited: false },
+                    { name: "CMEI Alexander de Borba", link: "https://maps.app.goo.gl/VwX1yA2bC8dE4gJ7l", visited: false },
+                    { name: "EMEB Machado de Assis", link: "https://maps.app.goo.gl/CdE2fH3iJ9kL5nQ8s", visited: false },
+                    { name: "CMEI Cecília Satler Karsten", link: "https://maps.app.goo.gl/DeF3gI4jK0lM6oR9t", visited: false }
+                ],
+                "ROTA J4 - SUDESTE": [
+                    { name: "EMEB Francisco de Paula", link: "https://maps.app.goo.gl/LmN1oQ2rS8tU4wZ7b", visited: false },
+                    { name: "CMEI Apolonia Stählin Junks", link: "https://maps.app.goo.gl/PqR5sU6vW2xY8aD1f", visited: false },
+                    { name: "CMEI Guilherme Tribess", link: "https://maps.app.goo.gl/JkL9mO0pQ6rS2uX5z", visited: false },
+                    { name: "CMEI Prof.ª Ilse Dumke Giese", link: "https://maps.app.goo.gl/OpQ4rT5uV1wX7zC0e", visited: false },
+                    { name: "EMEB Renato Pradi - CAIC", link: "https://maps.app.goo.gl/PqR5sU6vW2xY8aD1f", visited: false },
+                    { name: "EMEB Jonas Alves de Souza", link: "https://maps.app.goo.gl/MnO2pR3sT9uV5xA8c", visited: false },
+                    { name: "CMEI Marcio Mauro Marcatto Filho", link: "https://maps.app.goo.gl/OpQ4rT5uV1wX7zC0e", visited: false },
+                    { name: "EMEB Maria Nilda Salai Stähelin", link: "https://maps.app.goo.gl/StU8vX9yZ5aB1dG4i", visited: false },
+                    { name: "CMEI Jader Marcolla", link: "https://maps.app.goo.gl/KlM0nP1qR7sT3vY6a", visited: false },
+                    { name: "EMEB Anna Töwe Nagel", link: "https://maps.app.goo.gl/NoP3qS4tU0vW6yB9d", visited: false }
+                ],
+                "ROTA J5 - CENTRO": [
+                    { name: "CMEI Gertrudes Kanzler", link: "https://maps.app.goo.gl/TuV9wY0zA6bC2eH5j", visited: false },
+                    { name: "Pré-Escolar Eliane Welk Kreuzfeld", link: "https://maps.app.goo.gl/AbC6dF7gH3iJ9lO2q", visited: false },
+                    { name: "EMEB Albano Kanzler", link: "https://maps.app.goo.gl/UvW0xZ1aB7cD3fI6k", visited: false },
+                    { name: "EMEB Atayde Machado", link: "https://maps.app.goo.gl/YzA4bD5eF1gH7jM0o", visited: false },
+                    { name: "EMEB Alberto Bauer", link: "https://maps.app.goo.gl/BcD7eG8hI4jK0mP3r", visited: false },
+                    { name: "CMEI Marcio Klinkoski", link: "https://maps.app.goo.gl/CdE8fH9iJ5kL1nQ4s", visited: false }
+                ],
+                "ROTA J6 - OESTE": [
+                    { name: "CMEI Jones Chiodini", link: "https://maps.app.goo.gl/WxY2zB3cD9eF5hK8m", visited: false },
+                    { name: "EMEB Cristina Marcatto", link: "https://maps.app.goo.gl/ZaB5cE6fG2hI8kN1p", visited: false },
+                    { name: "CMEI Carlo Andrei Emmendöerfer", link: "https://maps.app.goo.gl/XyZ3aC4dE0fG6iL9n", visited: false },
+                    { name: "CMEI Prof.ª Leonir Passate Alves", link: "https://maps.app.goo.gl/DeF9gI0jK6lM2oR5t", visited: false },
+                    { name: "EMEB Waldemar Schmitz", link: "https://maps.app.goo.gl/GhI2jL3mN9oP5rU8w", visited: false },
+                    { name: "CMEI Elza Behling Grossklags", link: "https://maps.app.goo.gl/IjK4lN5oP1qR7tW0y", visited: false },
+                    { name: "CMEI Robson da Silva Breis", link: "https://maps.app.goo.gl/NoP9qS0tU6vW2yB5d", visited: false },
+                    { name: "EMEB Erich Blosfeld", link: "https://maps.app.goo.gl/OpQ0rT1uV7wX3zC6e", visited: false },
+                    { name: "EMEB Adelino Francener", link: "https://maps.app.goo.gl/EfG0hJ1kL7mN3pS6u", visited: false },
+                    { name: "CMEI Rodolfo Hufenussler", link: "https://maps.app.goo.gl/KlM6nP7qR3sT9vY2a", visited: false },
+                    { name: "CMEI Sidnei Alexandre Berns", link: "https://maps.app.goo.gl/MnO8pR9sT5uV1xA4c", visited: false },
+                    { name: "CMEI Rosa Maria Donini", link: "https://maps.app.goo.gl/FgH1iK2lM8nO4qT7v", visited: false },
+                    { name: "EMEB Rodolpho Dornbusch", link: "https://maps.app.goo.gl/HiJ3kM4nO0pQ6sV9x", visited: false },
+                    { name: "CMEI Fraciane Ramos", link: "https://maps.app.goo.gl/JkL5mO6pQ2rS8uX1z", visited: false },
+                    { name: "EMEB Ribeirão Molha", link: "https://maps.app.goo.gl/LmN7oQ8rS4tU0wZ3b", visited: false }
+                ]
+            }
+        };
+
+        let editingItem = null;
+
+        // Salvar dados no localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('routesData', JSON.stringify(data));
+            updateStats();
+        }
+
+        // Carregar dados do localStorage
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('routesData');
+            if (saved) {
+                data = JSON.parse(saved);
+            }
+        }
+
+        // Renderizar conteúdo
+        function renderContent() {
+            const content = document.getElementById('mainContent');
+            content.innerHTML = '';
+
+            for (const city in data) {
+                const citySection = document.createElement('div');
+                citySection.className = 'city-section';
+
+                const totalInCity = Object.values(data[city]).reduce((sum, route) => sum + route.length, 0);
+                const routeCount = Object.keys(data[city]).length;
+
+                citySection.innerHTML = `
+                    <div class="city-header">
+                        <div class="city-name">
+                            <span>🏙️ ${city}</span>
+                            <span class="badge">${totalInCity} instituições</span>
+                        </div>
+                    </div>
+                `;
+
+                for (const route in data[city]) {
+                    const institutions = data[city][route];
+                    const visited = institutions.filter(i => i.visited).length;
+                    const total = institutions.length;
+
+                    const routeSection = document.createElement('div');
+                    routeSection.className = 'route-section';
+                    routeSection.innerHTML = `
+                        <div class="route-header" onclick="toggleRoute(this)">
+                            <div class="route-info">
+                                <span>📍 ${route}</span>
+                            </div>
+                            <div class="stats">
+                                <span>✅ ${visited}/${total} visitadas</span>
+                                <span class="toggle-icon">▼</span>
+                            </div>
+                        </div>
+                        <div class="route-content" style="display: block;">
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Instituição</th>
+                                            <th>Localização</th>
+                                            <th style="text-align: center;">Visitada</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${institutions.map((inst, idx) => `
+                                            <tr>
+                                                <td>${idx + 1}</td>
+                                                <td class="institution-name">${inst.name}</td>
+                                                <td><a href="${inst.link}" target="_blank" class="link-btn">🗺️ Ver no Mapa</a></td>
+                                                <td class="checkbox-cell">
+                                                    <input type="checkbox" ${inst.visited ? 'checked' : ''} 
+                                                           onchange="toggleVisit('${city}', '${route}', ${idx})">
+                                                </td>
+                                                <td>
+                                                    <div class="action-btns">
+                                                        <button class="btn-edit" onclick="editInstitution('${city}', '${route}', ${idx})">✏️ Editar</button>
+                                                        <button class="btn-delete" onclick="deleteInstitution('${city}', '${route}', ${idx})">🗑️ Excluir</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    citySection.appendChild(routeSection);
+                }
+
+                content.appendChild(citySection);
+            }
+
+            updateStats();
+        }
+
+        // Toggle rota
+        function toggleRoute(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.classList.remove('rotated');
+            } else {
+                content.style.display = 'none';
+                icon.classList.add('rotated');
+            }
+        }
+
+        // Atualizar estatísticas
+        function updateStats() {
+            let totalInst = 0;
+            let totalVisited = 0;
+            let totalRoutes = 0;
+
+            for (const city in data) {
+                totalRoutes += Object.keys(data[city]).length;
+                for (const route in data[city]) {
+                    const institutions = data[city][route];
+                    totalInst += institutions.length;
+                    totalVisited += institutions.filter(i => i.visited).length;
+                }
+            }
+
+            document.getElementById('totalInstitutions').textContent = totalInst;
+            document.getElementById('totalRoutes').textContent = totalRoutes;
+            document.getElementById('visitedCount').textContent = totalVisited;
+            document.getElementById('pendingCount').textContent = totalInst - totalVisited;
+        }
+
+        // Toggle visita
+        function toggleVisit(city, route, idx) {
+            data[city][route][idx].visited = !data[city][route][idx].visited;
+            saveToLocalStorage();
+            renderContent();
+        }
+
+        // Filtrar tabela
+        function filterTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+
+        // Abrir modal
+        function openAddModal(type) {
+            if (type === 'institution') {
+                populateCitySelect();
+                document.getElementById('modalTitle').textContent = 'Adicionar Nova Instituição';
+                document.getElementById('formModal').style.display = 'block';
+            } else if (type === 'route') {
+                populateRouteCitySelect();
+                document.getElementById('routeModal').style.display = 'block';
+            } else if (type === 'city') {
+                document.getElementById('cityModal').style.display = 'block';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('formModal').style.display = 'none';
+            document.getElementById('itemForm').reset();
+            editingItem = null;
+        }
+
+        function closeRouteModal() {
+            document.getElementById('routeModal').style.display = 'none';
+            document.getElementById('routeForm').reset();
+        }
+
+        function closeCityModal() {
+            document.getElementById('cityModal').style.display = 'none';
+            document.getElementById('cityForm').reset();
+        }
+
+        // Popular select de cidade
+        function populateCitySelect() {
+            const select = document.getElementById('citySelect');
+            select.innerHTML = '<option value="">Selecione uma cidade</option>';
+            for (const city in data) {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                select.appendChild(option);
+            }
+        }
+
+        function populateRouteCitySelect() {
+            const select = document.getElementById('routeCitySelect');
+            select.innerHTML = '<option value="">Selecione uma cidade</option>';
+            for (const city in data) {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                select.appendChild(option);
+            }
+        }
+
+        // Popular select de rota
+        document.getElementById('citySelect').addEventListener('change', function() {
+            const city = this.value;
+            const routeSelect = document.getElementById('routeSelect');
+            routeSelect.innerHTML = '<option value="">Selecione uma rota</option>';
+
+            if (city && data[city]) {
+                for (const route in data[city]) {
+                    const option = document.createElement('option');
+                    option.value = route;
+                    option.textContent = route;
+                    routeSelect.appendChild(option);
+                }
+            }
+        });
+
+        // Salvar cidade
+        function saveCity() {
+            const cityName = document.getElementById('cityName').value.trim().toUpperCase();
+            
+            if (!cityName) {
+                alert('Por favor, preencha o nome da cidade.');
+                return;
+            }
+
+            if (data[cityName]) {
+                alert('Cidade já existe!');
+                return;
+            }
+
+            data[cityName] = {};
+            saveToLocalStorage();
+            renderContent();
+            closeCityModal();
+            alert('Cidade adicionada com sucesso!');
+        }
+
+        // Salvar rota
+        function saveRoute() {
+            const city = document.getElementById('routeCitySelect').value;
+            const routeName = document.getElementById('routeName').value.trim().toUpperCase();
+
+            if (!city || !routeName) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            if (data[city][routeName]) {
+                alert('Rota já existe nesta cidade!');
+                return;
+            }
+
+            data[city][routeName] = [];
+            saveToLocalStorage();
+            renderContent();
+            closeRouteModal();
+            alert('Rota adicionada com sucesso!');
+        }
+
+        // Salvar instituição
+        function saveItem() {
+            const city = document.getElementById('citySelect').value;
+            const route = document.getElementById('routeSelect').value;
+            const name = document.getElementById('institutionName').value.trim();
+            const link = document.getElementById('locationLink').value.trim();
+
+            if (!city || !route || !name || !link) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            if (editingItem) {
+                // Editar
+                data[editingItem.city][editingItem.route][editingItem.idx] = {
+                    name: name,
+                    link: link,
+                    visited: data[editingItem.city][editingItem.route][editingItem.idx].visited
+                };
+            } else {
+                // Adicionar novo
+                data[city][route].push({
+                    name: name,
+                    link: link,
+                    visited: false
+                });
+            }
+
+            saveToLocalStorage();
+            renderContent();
+            closeModal();
+        }
+
+        // Editar instituição
+        function editInstitution(city, route, idx) {
+            editingItem = { city, route, idx };
+            const inst = data[city][route][idx];
+
+            document.getElementById('modalTitle').textContent = 'Editar Instituição';
+            populateCitySelect();
+            
+            document.getElementById('citySelect').value = city;
+            document.getElementById('citySelect').dispatchEvent(new Event('change'));
+            
+            setTimeout(() => {
+                document.getElementById('routeSelect').value = route;
+                document.getElementById('institutionName').value = inst.name;
+                document.getElementById('locationLink').value = inst.link;
+            }, 100);
+
+            document.getElementById('formModal').style.display = 'block';
+        }
+
+        // Deletar instituição
+        function deleteInstitution(city, route, idx) {
+            if (confirm('Tem certeza que deseja excluir esta instituição?')) {
+                data[city][route].splice(idx, 1);
+                saveToLocalStorage();
+                renderContent();
+            }
+        }
+
+        // Exportar dados
+        function exportData() {
+            let csv = 'Cidade,Rota,Número,Instituição,Link,Visitada\n';
+            
+            for (const city in data) {
+                for (const route in data[city]) {
+                    data[city][route].forEach((inst, idx) => {
+                        csv += `"${city}","${route}",${idx + 1},"${inst.name}","${inst.link}",${inst.visited ? 'Sim' : 'Não'}\n`;
+                    });
+                }
+            }
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `rotas_seguranca_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modals = [
+                document.getElementById('formModal'),
+                document.getElementById('routeModal'),
+                document.getElementById('cityModal')
+            ];
+            
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        // Inicializar
+        loadFromLocalStorage();
+        renderContent();
+    </script>
+</body>
+</html>

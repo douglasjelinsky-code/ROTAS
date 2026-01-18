@@ -1,472 +1,703 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#020f0d" />
-  <title>SISTEMA DE ROTAS | ESTÁVEL</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CENTRO DE COMANDO: Rotas Orbenk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background: #0a0e27;
+            color: #00d9ff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-  <style>
-    /* ========== RESET & CORE ========== */
-    :root {
-      --bg: #020f0d;
-      --card: rgba(255, 255, 255, 0.04);
-      --accent: #00ffc6;
-      --text: #e8fff8;
-      --text-dim: rgba(232, 255, 248, 0.5);
-      --danger: #ff0058;
-      --success: #2dff7a;
-      --border: rgba(0, 255, 198, 0.15);
-    }
+        /* Scanlines Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(
+                0deg,
+                rgba(0, 217, 255, 0.03) 0px,
+                rgba(0, 217, 255, 0.03) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
-    body {
-      font-family: 'Inter', sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      background-image: radial-gradient(circle at 50% 0%, rgba(0, 255, 198, 0.08) 0%, transparent 70%);
-      min-height: 100vh;
-      line-height: 1.4;
-      overflow-x: hidden; /* Impede scroll horizontal */
-    }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1rem;
-    }
+        /* Header */
+        header {
+            border-bottom: 1px solid rgba(0, 217, 255, 0.3);
+            background: linear-gradient(to right, #0a0e27, #0a0e27, #0a0e27);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.1);
+        }
 
-    /* ========== HEADER ========== */
-    header {
-      background: rgba(2, 15, 13, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      padding: 0.75rem 1rem;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
 
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #00d9ff;
+        }
 
-    .brand h1 {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.9rem;
-      letter-spacing: 1px;
-      color: #fff;
-    }
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
 
-    /* ========== DASHBOARD ========== */
-    .dashboard {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr); /* 2 colunas no mobile */
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
+        .pulse-dot.cyan {
+            background: #00d9ff;
+            box-shadow: 0 0 10px #00d9ff;
+        }
 
-    @media (min-width: 768px) {
-      .dashboard { grid-template-columns: repeat(4, 1fr); }
-    }
+        .pulse-dot.magenta {
+            background: #ff006e;
+            box-shadow: 0 0 10px #ff006e;
+        }
 
-    .stat-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.75rem;
-      text-align: center;
-    }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
 
-    .stat-val { display: block; font-family: 'Space Mono', monospace; font-size: 1.2rem; font-weight: 700; color: var(--accent); }
-    .stat-lab { font-size: 0.55rem; text-transform: uppercase; color: var(--text-dim); }
+        .header-status {
+            font-size: 11px;
+            color: #00d9ff;
+            text-align: right;
+        }
 
-    /* ========== CONTROLS ========== */
-    .controls {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
+        .header-subtitle {
+            font-size: 11px;
+            color: #00d9ff;
+            opacity: 0.8;
+        }
 
-    .search-box {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.6rem 0.8rem;
-      color: #fff;
-      font-size: 0.9rem;
-      outline: none;
-    }
+        /* Main Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            padding: 30px 0;
+            min-height: calc(100vh - 100px);
+        }
 
-    .btn-add-main {
-      background: var(--accent);
-      color: var(--bg);
-      border: none;
-      border-radius: 8px;
-      padding: 0 1rem;
-      font-weight: 800;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-    /* ========== CONTENT ========== */
-    .city-group { margin-bottom: 1.5rem; }
-    .city-title {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.9rem;
-      color: var(--text-dim);
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .city-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .sidebar-panel {
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            background: #0f1535;
+            box-shadow: inset 0 0 10px rgba(0, 217, 255, 0.05);
+        }
 
-    /* VISUALIZAÇÃO CONDICIONAL */
-    .desktop-only { display: none; }
-    .mobile-only { display: block; }
+        .sidebar-panel h2 {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-    @media (min-width: 768px) {
-      .desktop-only { display: block; }
-      .mobile-only { display: none; }
-    }
+        .sidebar-panel.cidades h2 {
+            color: #00d9ff;
+        }
 
-    /* ESTILO DESKTOP (TABELA) */
-    .route-card {
-      background: var(--card);
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      margin-bottom: 1rem;
-      overflow: hidden;
-    }
-    .route-header {
-      padding: 0.6rem 1rem;
-      background: rgba(255, 255, 255, 0.02);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-family: 'Space Mono', monospace;
-      font-size: 0.8rem;
-      color: var(--accent);
-    }
-    table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; }
-    td { padding: 0.6rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 0.8rem; }
+        .sidebar-panel.rotas h2 {
+            color: #ff006e;
+        }
 
-    /* ESTILO MOBILE (CARDS ESTÁVEIS) */
-    .m-posto-card {
-      background: var(--card);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 0.75rem;
-      position: relative;
-    }
-    .m-posto-card.visited { border-color: var(--success); }
-    .m-posto-card.visited::after {
-      content: '✓';
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      color: var(--success);
-      font-weight: 800;
-    }
-    .m-title { font-weight: 700; color: #fff; font-size: 1rem; margin-bottom: 0.25rem; display: block; }
-    .m-route { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--accent); margin-bottom: 0.75rem; display: block; }
-    .m-info-row { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 5px; }
-    .m-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 1rem; }
-    .m-btn {
-      padding: 0.6rem;
-      border-radius: 8px;
-      font-size: 0.7rem;
-      text-align: center;
-      text-decoration: none;
-      font-weight: 700;
-      font-family: 'Space Mono', monospace;
-      border: none;
-      cursor: pointer;
-    }
-    .m-btn-maps { background: var(--accent); color: var(--bg); }
-    .m-btn-check { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--border); }
-    .m-btn-check.active { background: var(--success); color: var(--bg); border: none; }
+        .sidebar-panel.stats h2 {
+            color: #00d9ff;
+        }
 
-    /* ========== MODAL ========== */
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      background: rgba(0,0,0,0.9);
-      backdrop-filter: blur(5px);
-      padding: 1rem;
-      overflow-y: auto;
-    }
-    .modal-content {
-      background: #0a1a18;
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      width: 100%;
-      max-width: 450px;
-      margin: 2rem auto;
-      padding: 1.5rem;
-    }
-    .form-group { margin-bottom: 0.75rem; }
-    .form-group label { display: block; font-size: 0.6rem; color: var(--text-dim); margin-bottom: 3px; text-transform: uppercase; }
-    .form-group input, .form-group select { 
-      width: 100%; 
-      background: rgba(255,255,255,0.05); 
-      border: 1px solid var(--border); 
-      border-radius: 6px; 
-      padding: 0.6rem; 
-      color: #fff; 
-      font-size: 0.9rem;
-    }
-    .modal-footer { display: flex; gap: 8px; margin-top: 1.5rem; }
-    .modal-footer button { flex: 1; padding: 0.75rem; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; }
-  </style>
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .button-group::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .button-group::-webkit-scrollbar-track {
+            background: rgba(0, 217, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .button-group::-webkit-scrollbar-thumb {
+            background: rgba(0, 217, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .btn {
+            padding: 10px 12px;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            background: #1a1f3a;
+            color: #00d9ff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: #252d4a;
+            box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn.active {
+            background: #00d9ff;
+            color: #0a0e27;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+        }
+
+        .btn.active.magenta {
+            background: #ff006e;
+            color: #0a0e27;
+            box-shadow: 0 0 15px rgba(255, 0, 110, 0.5);
+        }
+
+        .stats-item {
+            font-size: 12px;
+            color: #00d9ff;
+            margin-bottom: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        .stats-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Main Content Area */
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            background: #0f1535;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            color: #00d9ff;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(0, 217, 255, 0.5);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #00d9ff;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00d9ff;
+            font-size: 16px;
+        }
+
+        /* Instituições Grid */
+        .instituicoes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .instituicao-card {
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            background: #0f1535;
+            text-decoration: none;
+            color: #00d9ff;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .instituicao-card:hover {
+            border-color: #00d9ff;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+            background: #1a1f3a;
+        }
+
+        .instituicao-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .instituicao-id {
+            font-size: 10px;
+            color: rgba(0, 217, 255, 0.6);
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .instituicao-nome {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #00d9ff;
+            word-break: break-word;
+        }
+
+        .instituicao-bairro {
+            font-size: 12px;
+            color: rgba(0, 217, 255, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .instituicao-arrow {
+            color: #ff006e;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        /* Empty State */
+        .empty-state {
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 40px;
+            background: #0f1535;
+            text-align: center;
+            color: rgba(0, 217, 255, 0.7);
+            font-size: 14px;
+        }
+
+        /* Footer Info */
+        .footer-info {
+            border-top: 1px solid rgba(0, 217, 255, 0.3);
+            padding-top: 20px;
+            margin-top: 20px;
+            font-size: 11px;
+            color: rgba(0, 217, 255, 0.6);
+            line-height: 1.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px 0;
+            }
+
+            .sidebar {
+                order: 2;
+            }
+
+            .content {
+                order: 1;
+            }
+
+            .header-title {
+                font-size: 18px;
+                gap: 10px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .header-status {
+                text-align: left;
+            }
+
+            .button-group {
+                max-height: 150px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 16px;
+            color: #00d9ff;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.5; }
+        }
+    </style>
 </head>
 <body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="header-title">
+                    <div class="pulse-dot cyan"></div>
+                    CENTRO DE COMANDO
+                    <div class="pulse-dot magenta"></div>
+                </div>
+                <div class="header-status">
+                    ROTAS v2.1 | STATUS: ONLINE
+                </div>
+            </div>
+            <div class="header-subtitle">
+                &gt; Supervisor Douglas | Acesso autorizado
+            </div>
+        </div>
+    </header>
 
-  <header>
-    <div class="header-content">
-      <div class="brand"><h1>🛡️ ROTAS <span style="color: var(--accent)">SUP</span></h1></div>
-      <div style="display: flex; gap: 8px;">
-        <button class="btn-add-main" onclick="openModal('instModal')">+</button>
-        <button onclick="openModal('configModal')" style="background:none; border:none; font-size:1.2rem; cursor:pointer">⚙️</button>
-      </div>
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Cidades Panel -->
+                <div class="sidebar-panel cidades">
+                    <h2>📍 CIDADES</h2>
+                    <div class="button-group" id="cidadesGroup"></div>
+                </div>
+
+                <!-- Rotas Panel -->
+                <div class="sidebar-panel rotas">
+                    <h2>➤ ROTAS</h2>
+                    <div class="button-group" id="rotasGroup"></div>
+                </div>
+
+                <!-- Stats Panel -->
+                <div class="sidebar-panel stats">
+                    <h2>📊 ESTATÍSTICAS</h2>
+                    <div id="statsContainer"></div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="content">
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="searchInput" 
+                        placeholder="Buscar instituição ou bairro..."
+                    >
+                </div>
+
+                <!-- Instituições List -->
+                <div class="instituicoes-list" id="instituicoesList">
+                    <div class="loading">▓▒░ INICIALIZANDO SISTEMA ░▒▓</div>
+                </div>
+
+                <!-- Footer Info -->
+                <div class="footer-info">
+                    <div>&gt; Rota selecionada: <span id="rotaSelecionada">-</span></div>
+                    <div>&gt; Cidade: <span id="cidadeSelecionada">-</span></div>
+                    <div>&gt; Resultados: <span id="resultados">0</span>/<span id="totalResultados">0</span></div>
+                    <div>&gt; Clique em qualquer instituição para abrir no Google Maps</div>
+                </div>
+            </main>
+        </div>
     </div>
-  </header>
 
-  <div class="container">
-    <!-- DASHBOARD -->
-    <div class="dashboard">
-      <div class="stat-box"><span class="stat-val" id="s-total">0</span><span class="stat-lab">Postos</span></div>
-      <div class="stat-box"><span class="stat-val" id="s-vistos" style="color: var(--success)">0</span><span class="stat-lab">Vistos</span></div>
-      <div class="stat-box"><span class="stat-val" id="s-falta" style="color: var(--danger)">0</span><span class="stat-lab">Faltam</span></div>
-      <div class="stat-box"><span class="stat-val" id="s-perc">0%</span><span class="stat-lab">Progresso</span></div>
-    </div>
-
-    <!-- BUSCA -->
-    <div class="controls">
-      <input type="text" class="search-box" id="searchInput" placeholder="Buscar posto, rota ou vigilante..." onkeyup="render()">
-    </div>
-
-    <!-- CONTEÚDO -->
-    <div id="mainContent"></div>
-  </div>
-
-  <!-- MODAL POSTO -->
-  <div id="instModal" class="modal"><div class="modal-content">
-    <h2 style="margin-bottom:1rem; font-family:'Space Mono'; font-size:1rem; color:var(--accent)">GERENCIAR POSTO</h2>
-    <div class="form-group"><label>Cidade</label><select id="iCity" onchange="updR()"></select></div>
-    <div class="form-group"><label>Rota</label><select id="iRoute"></select></div>
-    <div class="form-group"><label>Nome do Posto</label><input type="text" id="iName"></div>
-    <div class="form-group"><label>Link Maps</label><input type="text" id="iLink"></div>
-    <div class="form-group"><label>Vigilante</label><input type="text" id="iVig"></div>
-    <div class="form-group"><label>Matrícula</label><input type="text" id="iMat"></div>
-    <div class="form-group"><label>Telefone</label><input type="text" id="iTel"></div>
-    <div class="modal-footer">
-      <button style="background:rgba(255,255,255,0.05); color:#fff" onclick="closeModal('instModal')">CANCELAR</button>
-      <button style="background:var(--accent); color:var(--bg)" onclick="saveInst()">SALVAR</button>
-    </div>
-  </div></div>
-
-  <!-- MODAL CONFIG (CIDADES/ROTAS) -->
-  <div id="configModal" class="modal"><div class="modal-content">
-    <h2 style="margin-bottom:1rem; font-family:'Space Mono'; font-size:1rem; color:var(--accent)">CONFIGURAÇÕES</h2>
-    <div style="border-bottom:1px solid var(--border); padding-bottom:1rem; margin-bottom:1rem">
-      <label style="font-size:0.6rem; color:var(--text-dim); display:block; margin-bottom:5px">NOVA CIDADE</label>
-      <div style="display:flex; gap:5px">
-        <input type="text" id="nCity" style="flex:1; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:#fff; padding:5px; border-radius:5px">
-        <button onclick="saveCity()" style="background:var(--accent); border:none; padding:5px 10px; border-radius:5px; font-weight:700">ADD</button>
-      </div>
-    </div>
-    <div>
-      <label style="font-size:0.6rem; color:var(--text-dim); display:block; margin-bottom:5px">NOVA ROTA</label>
-      <select id="rCity" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:#fff; padding:5px; border-radius:5px; margin-bottom:5px"></select>
-      <div style="display:flex; gap:5px">
-        <input type="text" id="nRoute" style="flex:1; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:#fff; padding:5px; border-radius:5px">
-        <button onclick="saveRoute()" style="background:var(--accent); border:none; padding:5px 10px; border-radius:5px; font-weight:700">ADD</button>
-      </div>
-    </div>
-    <button style="width:100%; margin-top:1.5rem; padding:0.75rem; background:rgba(255,255,255,0.05); color:#fff; border:none; border-radius:8px" onclick="closeModal('configModal')">FECHAR</button>
-  </div></div>
-
-  <script>
-    let data = {
-        "JARAGUÁ DO SUL": {
-            "ROTA 01": [
-                { name: "CMEI Robson da Silva Breis", link: "https://maps.app.goo.gl/NoP9qS0tU6vW2yB5d", visited: false, matricula: "12345", vigilante: "Douglas Jelinsky", telefone: "(47) 99999-9999" }
-            ]
-        }
-    };
-
-    let editRef = null;
-
-    function init() {
-        const saved = localStorage.getItem('routesDataFinal');
-        if (saved) data = JSON.parse(saved);
-        render();
-    }
-
-    function save() {
-        localStorage.setItem('routesDataFinal', JSON.stringify(data));
-        render();
-    }
-
-    function render() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        const container = document.getElementById('mainContent');
-        container.innerHTML = '';
-        
-        let total = 0, vistos = 0;
-
-        for (const city in data) {
-            let cityHasMatch = false;
-            const cityDiv = document.createElement('div');
-            cityDiv.className = 'city-group';
-            cityDiv.innerHTML = `<div class="city-title">🏙️ ${city}</div>`;
-            
-            for (const route in data[city]) {
-                const insts = data[city][route].filter(i => 
-                    i.name.toLowerCase().includes(query) || 
-                    route.toLowerCase().includes(query) || 
-                    (i.vigilante && i.vigilante.toLowerCase().includes(query)) ||
-                    (i.matricula && i.matricula.toLowerCase().includes(query))
-                );
-
-                if (insts.length > 0) {
-                    cityHasMatch = true;
-                    
-                    // DESKTOP VIEW
-                    const dCard = document.createElement('div');
-                    dCard.className = 'route-card desktop-only';
-                    dCard.innerHTML = `
-                        <div class="route-header">📍 ${route}</div>
-                        <table>
-                            <thead><tr><th width="30"></th><th>Posto</th><th>Vigilante</th><th width="50"></th></tr></thead>
-                            <tbody>${insts.map(i => {
-                                total++; if(i.visited) vistos++;
-                                const realIdx = data[city][route].indexOf(i);
-                                return `<tr>
-                                    <td><input type="checkbox" ${i.visited?'checked':''} onchange="toggle('${city}','${route}',${realIdx})"></td>
-                                    <td><strong>${i.name}</strong><br><a href="${i.link}" target="_blank" style="color:var(--accent); font-size:0.6rem">MAPS</a></td>
-                                    <td>${i.vigilante||'---'}<br><small style="color:var(--text-dim)">MAT: ${i.matricula||'---'}</small></td>
-                                    <td><button onclick="edit('${city}','${route}',${realIdx})" style="background:none; border:none; cursor:pointer">✏️</button></td>
-                                </tr>`;
-                            }).join('')}</tbody>
-                        </table>
-                    `;
-                    cityDiv.appendChild(dCard);
-
-                    // MOBILE VIEW
-                    insts.forEach(i => {
-                        const realIdx = data[city][route].indexOf(i);
-                        if(window.innerWidth < 768) { total++; if(i.visited) vistos++; } // Contagem correta no mobile
-                        const mCard = document.createElement('div');
-                        mCard.className = `m-posto-card mobile-only ${i.visited?'visited':''}`;
-                        mCard.innerHTML = `
-                            <span class="m-title">${i.name}</span>
-                            <span class="m-route">📍 ${route}</span>
-                            <div class="m-info-row">👤 ${i.vigilante||'---'}</div>
-                            <div class="m-info-row">📞 ${i.telefone||'---'}</div>
-                            <div class="m-actions">
-                                <a href="${i.link}" target="_blank" class="m-btn m-btn-maps">MAPS</a>
-                                <button class="m-btn m-btn-check ${i.visited?'active':''}" onclick="toggle('${city}','${route}',${realIdx})">
-                                    ${i.visited?'CONCLUÍDO':'VISITAR'}
-                                </button>
-                            </div>
-                            <button onclick="edit('${city}','${route}',${realIdx})" style="position:absolute; bottom:10px; right:10px; background:none; border:none; font-size:0.8rem">✏️</button>
-                        `;
-                        cityDiv.appendChild(mCard);
-                    });
-                }
+    <script>
+        // Dados das rotas escolares
+        const rotasData = {
+            "JARAGUA": {
+                "ROTA J1": [
+                    {"id": 1, "instituicao": "C.M.E.I. WOLFGANG WEEGE", "bairro": "Barra do Rio Cerro", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20WOLFGANG%20WEEGE%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 2, "instituicao": "E.M.E.B. ANTÔNIO ESTANISLAU AYROSO", "bairro": "Barra do Rio Cerro / Jaraguá 99", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20ANT%C3%94NIO%20ESTANISLAU%20AYROSO%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 3, "instituicao": "C.M.E.I. ONELIA MULLER ERSCHINK", "bairro": "Jaraguá 99", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20ONELIA%20MULLER%20ERSCHINK%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 4, "instituicao": "E.M.E.B. GUILHERME HANEMANN", "bairro": "Barra do Rio Cerro", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20GUILHERME%20HANEMANN%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 5, "instituicao": "E.M.E.B. HELMUTH GUILHERME DUWE", "bairro": "Rio da Luz", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20HELMUTH%20GUILHERME%20DUWE%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 6, "instituicao": "E.M.E.B. PROFª. GERTRUDES S. MILBRATZ", "bairro": "Rio da Luz", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20PROF%C2%AA.%20GERTRUDES%20S.%20MILBRATZ%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 7, "instituicao": "C.M.E.I. RUI KROEGER", "bairro": "Rio da Luz", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20RUI%20KROEGER%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 8, "instituicao": "E.M.E.B. PROFª. HENRIQUE HEISE", "bairro": "Rio da Luz", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20PROF%C2%AA.%20HENRIQUE%20HEISE%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 9, "instituicao": "E.M.E.B. SANTO ESTEVÃO", "bairro": "Garibaldi", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20SANTO%20ESTEV%C3%83O%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 10, "instituicao": "E.M.E.B. LUIZ GONZAGA AYROSO", "bairro": "Jaraguá 84", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20LUIZ%20GONZAGA%20AYROSO%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 11, "instituicao": "C.M.E.I. WALDIR EDSON THEILACKER", "bairro": "Jaraguá 84", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20WALDIR%20EDSON%20THEILACKER%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 12, "instituicao": "E.M.E.B. RICIERI MARCATTO", "bairro": "Rio Cerro I", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20RICIERI%20MARCATTO%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 13, "instituicao": "C.M.E.I. EMMA GRUTZMACHER DALLMANN", "bairro": "Rio Cerro II", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20EMMA%20GRUTZMACHER%20DALLMANN%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 14, "instituicao": "E.M.E.B. MARCOS EMÍLIO VERBINNEN", "bairro": "Estrada Nova", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20MARCOS%20EM%C3%8DLIO%20VERBINNEN%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 15, "instituicao": "C.M.E.I. ESTRADA NOVA", "bairro": "Estrada Nova", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20ESTRADA%20NOVA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 16, "instituicao": "E.M.E.B. PADRE ALBERTO JACOBS", "bairro": "Tifa Monos", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20PADRE%20ALBERTO%20JACOBS%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"}
+                ],
+                "ROTA J2": [
+                    {"id": 17, "instituicao": "E.M.E.B. VITOR MEIRELLES", "bairro": "Três Rios do Norte / Santo Antônio", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20VITOR%20MEIRELLES%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 18, "instituicao": "C.M.E.I. MARCIO NICOLLINI", "bairro": "Santo Antônio", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20MARCIO%20NICOLLINI%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 19, "instituicao": "E.M.E.B. PROFª. FRANCISCO SOLAMON", "bairro": "Santo Antônio", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20PROF%C2%AA.%20FRANCISCO%20SOLAMON%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 20, "instituicao": "C.M.E.I. DANIEL CARLOS PRETTI", "bairro": "Sta Luzia / Três Rios", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20DANIEL%20CARLOS%20PRETTI%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 21, "instituicao": "E.M.E.B. MAX SCHUBERT", "bairro": "Três Rios do Norte", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20MAX%20SCHUBERT%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 22, "instituicao": "C.M.E.I. Prof.ª ALVINA KARSTEN SCHWEDLER", "bairro": "Três Rios do Sul", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20Prof.%C2%AA%20ALVINA%20KARSTEN%20SCHWEDLER%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 23, "instituicao": "PRÉ-ESCOLA PROF. MARIA LUCY DE SIMAS", "bairro": "Três Rios do Sul", "link": "https://www.google.com/maps/search/?api=1&query=PR%C3%89-ESCOLA%20PROF.%20MARIA%20LUCY%20DE%20SIMAS%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"}
+                ],
+                "ROTA J3": [
+                    {"id": 24, "instituicao": "E.M.E.B. JOAQUIM FERRAZZA", "bairro": "Braço do Ribeirão Cavalo", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20JOAQUIM%20FERRAZZA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 25, "instituicao": "C.M.E.I. GUSTAVO MATHEDI", "bairro": "Ribeirão do Cavalo", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20GUSTAVO%20MATHEDI%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 26, "instituicao": "C.M.E.I. MARIA MOKWA KITKOSKY", "bairro": "Braço do Ribeirão Cavalo", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20MARIA%20MOKWA%20KITKOSKY%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 27, "instituicao": "C.M.E.I. ALMIDA DALCANALE BERTOLI", "bairro": "Nereu Ramos", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20ALMIDA%20DALCANALE%20BERTOLI%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 28, "instituicao": "E.M.E.B. LOTEAMENTO AMIZADE", "bairro": "Amizade", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20LOTEAMENTO%20AMIZADE%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 29, "instituicao": "C.M.E.I. ALEXANDER ENKE", "bairro": "Amizade", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20ALEXANDER%20ENKE%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 30, "instituicao": "C.M.E.I. ALEXANDER DE BORBA", "bairro": "Amizade", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20ALEXANDER%20DE%20BORBA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 31, "instituicao": "E.M.E.B. MACHADO DE ASSIS", "bairro": "João Pessoa", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20MACHADO%20DE%20ASSIS%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 32, "instituicao": "C.M.E.I. CECÍLIA SATLER KARSTEN", "bairro": "João Pessoa", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20CEC%C3%8DLIA%20SATLER%20KARSTEN%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"}
+                ],
+                "ROTA J4": [
+                    {"id": 33, "instituicao": "E.M.E.B. FRANCISCO DE PAULA", "bairro": "Chico de Paulo", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20FRANCISCO%20DE%20PAULA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 34, "instituicao": "C.M.E.I. APOLONIA STÄHLIN JUNKS", "bairro": "Chico de Paulo", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20APOLONIA%20ST%C3%84HLIN%20JUNKS%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 35, "instituicao": "C.M.E.I. GUILHERME TRIBESS", "bairro": "São Luís", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20GUILHERME%20TRIBESS%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 36, "instituicao": "C.M.E.I. Prof.ª ILSE DUMKE GIESE", "bairro": "São Luís", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20Prof.%C2%AA%20ILSE%20DUMKE%20GIESE%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 37, "instituicao": "E.M.E.B. RENATO PRADI - CAIC", "bairro": "São Luís", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20RENATO%20PRADI%20-%20CAIC%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 38, "instituicao": "E.M.E.B. JONAS ALVES DE SOUZA", "bairro": "Tifa Martins", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20JONAS%20ALVES%20DE%20SOUZA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 39, "instituicao": "C.M.E.I. MARCIO MAURO MARCATTO FILHO", "bairro": "Tifa Martins", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20MARCIO%20MAURO%20MARCATTO%20FILHO%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 40, "instituicao": "E.M.E.B. MARIA NILDA SALAI STÄHELIN", "bairro": "Tifa Martins", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20MARIA%20NILDA%20SALAI%20ST%C3%84HELIN%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 41, "instituicao": "C.M.E.I. JADER MARCOLLA", "bairro": "Água Verde", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20JADER%20MARCOLLA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 42, "instituicao": "E.M.E.B. ANNA TÖWE NAGEL", "bairro": "Água Verde", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20ANNA%20T%C3%96WE%20NAGEL%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"}
+                ],
+                "ROTA J5": [
+                    {"id": 43, "instituicao": "C.M.E.I. GERTRUDES KANZLER", "bairro": "Vila Lenzi", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20GERTRUDES%20KANZLER%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 44, "instituicao": "PRÉ-ESCOLAR ELIANE WELK KREUTZFELD", "bairro": "Vila Lenzi", "link": "https://www.google.com/maps/search/?api=1&query=PR%C3%89-ESCOLAR%20ELIANE%20WELK%20KREUTZFELD%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 45, "instituicao": "E.M.E.B. ALBANO KANZLER", "bairro": "Nova Brasília", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20ALBANO%20KANZLER%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 46, "instituicao": "E.M.E.B. ATAYDE MACHADO", "bairro": "Czerniewicz", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20ATAYDE%20MACHADO%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 47, "instituicao": "E.M.E.B. ALBERTO BAUER", "bairro": "Czerniewicz", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20ALBERTO%20BAUER%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 48, "instituicao": "C.M.E.I. MARCIO KLINKOSKI", "bairro": "Vila Nova", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20MARCIO%20KLINKOSKI%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"}
+                ],
+                "ROTA J6": [
+                    {"id": 49, "instituicao": "C.M.E.I. JONES CHIODINI", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20JONES%20CHIODINI%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 50, "instituicao": "E.M.E.B. CRISTINA MARCATTO", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20CRISTINA%20MARCATTO%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 51, "instituicao": "C.M.E.I. MANOEL FRANCISCO MACHADO", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20MANOEL%20FRANCISCO%20MACHADO%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 52, "instituicao": "E.M.E.B. SANTA TEREZINHA", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20SANTA%20TEREZINHA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 53, "instituicao": "C.M.E.I. MARTA CARDOSO MENEZES", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20MARTA%20CARDOSO%20MENEZES%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 54, "instituicao": "E.M.E.B. JOÃO BATISTA BAUER", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20JO%C3%83O%20BATISTA%20BAUER%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 55, "instituicao": "C.M.E.I. MARIA HELENA BAUER", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20MARIA%20HELENA%20BAUER%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 56, "instituicao": "E.M.E.B. JOÃO DUARTE BAUER", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20JO%C3%83O%20DUARTE%20BAUER%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 57, "instituicao": "C.M.E.I. JOÃO CARLOS BAUER", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20JO%C3%83O%20CARLOS%20BAUER%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 58, "instituicao": "E.M.E.B. SANTA RITA", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20SANTA%20RITA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 59, "instituicao": "C.M.E.I. SANTA RITA", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20SANTA%20RITA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 60, "instituicao": "E.M.E.B. SANTA ROSA", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20SANTA%20ROSA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 61, "instituicao": "C.M.E.I. SANTA ROSA", "bairro": "Jaraguá Esquerdo", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20SANTA%20ROSA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 62, "instituicao": "E.M.E.B. VILA NOVA", "bairro": "Vila Nova", "link": "https://www.google.com/maps/search/?api=1&query=E.M.E.B.%20VILA%20NOVA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"},
+                    {"id": 63, "instituicao": "C.M.E.I. VILA NOVA", "bairro": "Vila Nova", "link": "https://www.google.com/maps/search/?api=1&query=C.M.E.I.%20VILA%20NOVA%2C%20Jaragu%C3%A1%20do%20Sul%2C%20SC"}
+                ]
+            },
+            "GUARAMIRIM": {
+                "ROTA G1": [
+                    {"id": 1, "instituicao": "CEI PAULA FELDMANN / SANTINA SCHORCK", "bairro": "Centro/Avaí", "link": "https://www.google.com/maps/search/?api=1&query=CEI%20PAULA%20FELDMANN%20/%20SANTINA%20SCHORCK%2C%20Guaramirim%2C%20SC"},
+                    {"id": 2, "instituicao": "EMEF E PE DORVALINO FELIPPI", "bairro": "Centro/Avaí", "link": "https://www.google.com/maps/search/?api=1&query=EMEF%20E%20PE%20DORVALINO%20FELIPPI%2C%20Guaramirim%2C%20SC"},
+                    {"id": 3, "instituicao": "CEI ZILMA FLORES", "bairro": "Amizade", "link": "https://www.google.com/maps/search/?api=1&query=CEI%20ZILMA%20FLORES%2C%20Guaramirim%2C%20SC"},
+                    {"id": 4, "instituicao": "EM EF E PE URBANO TEIXEIRA", "bairro": "Amizade", "link": "https://www.google.com/maps/search/?api=1&query=EM%20EF%20E%20PE%20URBANO%20TEIXEIRA%2C%20Guaramirim%2C%20SC"},
+                    {"id": 5, "instituicao": "EM EF E PE LAURO CARNEIRO", "bairro": "Amizade", "link": "https://www.google.com/maps/search/?api=1&query=EM%20EF%20E%20PE%20LAURO%20CARNEIRO%2C%20Guaramirim%2C%20SC"},
+                    {"id": 6, "instituicao": "CEI ROSELI ULLMANN", "bairro": "Caixa d'Água", "link": "https://www.google.com/maps/search/?api=1&query=CEI%20ROSELI%20ULLMANN%2C%20Guaramirim%2C%20SC"},
+                    {"id": 7, "instituicao": "EMEF E PE PADRE MATHIAS M. STEIN", "bairro": "Caixa d'Água", "link": "https://www.google.com/maps/search/?api=1&query=EMEF%20E%20PE%20PADRE%20MATHIAS%20M.%20STEIN%2C%20Guaramirim%2C%20SC"},
+                    {"id": 8, "instituicao": "CEI ROSA TESTONI", "bairro": "Rio Branco/Beira Rio", "link": "https://www.google.com/maps/search/?api=1&query=CEI%20ROSA%20TESTONI%2C%20Guaramirim%2C%20SC"},
+                    {"id": 9, "instituicao": "EME e PE PROF ATILANO KRUGER", "bairro": "Rio Branco/Beira Rio", "link": "https://www.google.com/maps/search/?api=1&query=EME%20e%20PE%20PROF%20ATILANO%20KRUGER%2C%20Guaramirim%2C%20SC"},
+                    {"id": 10, "instituicao": "CEM PROF GUSTAVO TANK", "bairro": "Vila Amizade", "link": "https://www.google.com/maps/search/?api=1&query=CEM%20PROF%20GUSTAVO%20TANK%2C%20Guaramirim%2C%20SC"}
+                ],
+                "ROTA G2": [
+                    {"id": 11, "instituicao": "CEI JOANIR DASILVA / EMEF E PE JOSÉ DEQUECH", "bairro": "Corticeira/Imigrantes", "link": "https://www.google.com/maps/search/?api=1&query=CEI%20JOANIR%20DASILVA%20/%20EMEF%20E%20PE%20JOS%C3%89%20DEQUECH%2C%20Guaramirim%2C%20SC"},
+                    {"id": 12, "instituicao": "EMEF E PE IARO E HANSCH", "bairro": "Corticeira/Imigrantes", "link": "https://www.google.com/maps/search/?api=1&query=EMEF%20E%20PE%20IARO%20E%20HANSCH%2C%20Guaramirim%2C%20SC"},
+                    {"id": 13, "instituicao": "EMEF E CEI MAMÃE GANSA", "bairro": "Guamiranga", "link": "https://www.google.com/maps/search/?api=1&query=EMEF%20E%20CEI%20MAM%C3%83E%20GANSA%2C%20Guaramirim%2C%20SC"},
+                    {"id": 14, "instituicao": "EM EF E PE ANTONIO PLÁCIDO", "bairro": "Escolinha", "link": "https://www.google.com/maps/search/?api=1&query=EM%20EF%20E%20PE%20ANTONIO%20PL%C3%81CIDO%2C%20Guaramirim%2C%20SC"},
+                    {"id": 15, "instituicao": "EM EF E PE QUATI", "bairro": "Centro Geral/Quati", "link": "https://www.google.com/maps/search/?api=1&query=EM%20EF%20E%20PE%20QUATI%2C%20Guaramirim%2C%20SC"},
+                    {"id": 16, "instituicao": "EMEF E PE PROF ISABEL L R DE SOUZA", "bairro": "Bananal do Sul", "link": "https://www.google.com/maps/search/?api=1&query=EMEF%20E%20PE%20PROF%20ISABEL%20L%20R%20DE%20SOUZA%2C%20Guaramirim%2C%20SC"},
+                    {"id": 17, "instituicao": "EM EF E P ALICE OLINGER DIAS", "bairro": "Bananal do Sul", "link": "https://www.google.com/maps/search/?api=1&query=EM%20EF%20E%20P%20ALICE%20OLINGER%20DIAS%2C%20Guaramirim%2C%20SC"}
+                ],
+                "ROTA G3": [
+                    {"id": 18, "instituicao": "SENAI", "bairro": "SENAI", "link": "https://www.google.com/maps/search/?api=1&query=SENAI%2C%20Guaramirim%2C%20SC"},
+                    {"id": 19, "instituicao": "EMEF E PE GERMANO LAFFIN", "bairro": "Ilha da Figueira/Centro", "link": "https://www.google.com/maps/search/?api=1&query=EMEF%20E%20PE%20GERMANO%20LAFFIN%2C%20Guaramirim%2C%20SC"},
+                    {"id": 20, "instituicao": "CEI MARIA DOMÊNICA PEIXER", "bairro": "Centro Geral", "link": "https://www.google.com/maps/search/?api=1&query=CEI%20MARIA%20DOM%C3%8ANICA%20PEIXER%2C%20Guaramirim%2C%20SC"}
+                ],
+                "ROTA G4": [
+                    {"id": 21, "instituicao": "EMEF E PE CANTINHO DA AMIZADE", "bairro": "Beira Rio", "link": "https://www.google.com/maps/search/?api=1&query=EMEF%20E%20PE%20CANTINHO%20DA%20AMIZADE%2C%20Guaramirim%2C%20SC"},
+                    {"id": 22, "instituicao": "CEI MAURITA ROSA", "bairro": "Jacu Açu/Maurita", "link": "https://www.google.com/maps/search/?api=1&query=CEI%20MAURITA%20ROSA%2C%20Guaramirim%2C%20SC"}
+                ]
             }
-            if (cityHasMatch) container.appendChild(cityDiv);
-        }
-
-        // Se estiver no desktop, a contagem já foi feita. Se no mobile, ajustamos.
-        if(window.innerWidth >= 768) {
-            document.getElementById('s-total').textContent = total;
-            document.getElementById('s-vistos').textContent = vistos;
-            document.getElementById('s-falta').textContent = total - vistos;
-            document.getElementById('s-perc').textContent = total > 0 ? Math.round((vistos/total)*100) + '%' : '0%';
-        } else {
-            // Recalcula para mobile para evitar duplicidade na contagem do loop
-            let mt=0, mv=0;
-            for(let c in data) for(let r in data[c]) data[c][r].forEach(i => { mt++; if(i.visited) mv++; });
-            document.getElementById('s-total').textContent = mt;
-            document.getElementById('s-vistos').textContent = mv;
-            document.getElementById('s-falta').textContent = mt - mv;
-            document.getElementById('s-perc').textContent = mt > 0 ? Math.round((mv/mt)*100) + '%' : '0%';
-        }
-    }
-
-    // LÓGICA
-    function openModal(id) {
-        document.getElementById(id).style.display = 'block';
-        if(id === 'instModal' || id === 'configModal') {
-            const opts = Object.keys(data).map(c => `<option value="${c}">${c}</option>`).join('');
-            document.getElementById(id === 'instModal' ? 'iCity' : 'rCity').innerHTML = opts;
-            if(id === 'instModal') updR();
-        }
-    }
-    function closeModal(id) {
-        document.getElementById(id).style.display = 'none';
-        editRef = null;
-        if(id === 'instModal') ['iName','iLink','iVig','iMat','iTel'].forEach(k => document.getElementById(k).value = '');
-    }
-    function updR() {
-        const c = document.getElementById('iCity').value;
-        document.getElementById('iRoute').innerHTML = Object.keys(data[c]).map(r => `<option value="${r}">${r}</option>`).join('');
-    }
-    function saveCity() {
-        const n = document.getElementById('nCity').value.toUpperCase().trim();
-        if(n && !data[n]) { data[n] = {}; save(); document.getElementById('nCity').value=''; }
-    }
-    function saveRoute() {
-        const c = document.getElementById('rCity').value, n = document.getElementById('nRoute').value.toUpperCase().trim();
-        if(c && n && !data[c][n]) { data[c][n] = []; save(); document.getElementById('nRoute').value=''; }
-    }
-    function saveInst() {
-        const c = document.getElementById('iCity').value, r = document.getElementById('iRoute').value;
-        const inst = {
-            name: document.getElementById('iName').value,
-            link: document.getElementById('iLink').value,
-            vigilante: document.getElementById('iVig').value,
-            matricula: document.getElementById('iMat').value,
-            telefone: document.getElementById('iTel').value,
-            visited: editRef ? data[editRef.c][editRef.r][editRef.idx].visited : false
         };
-        if(editRef) data[editRef.c][editRef.r].splice(editRef.idx, 1);
-        if(!data[c][r]) data[c][r] = [];
-        data[c][r].push(inst);
-        save(); closeModal('instModal');
-    }
-    function toggle(c, r, idx) { data[c][r][idx].visited = !data[c][r][idx].visited; save(); }
-    function edit(c, r, idx) {
-        const i = data[c][r][idx]; editRef = {c, r, idx};
-        openModal('instModal');
-        document.getElementById('iCity').value = c; updR();
-        document.getElementById('iRoute').value = r;
-        document.getElementById('iName').value = i.name;
-        document.getElementById('iLink').value = i.link;
-        document.getElementById('iVig').value = i.vigilante;
-        document.getElementById('iMat').value = i.matricula;
-        document.getElementById('iTel').value = i.telefone;
-    }
 
-    window.addEventListener('resize', render);
-    init();
-  </script>
+        let selectedCidade = 'JARAGUA';
+        let selectedRota = 'ROTA J1';
+
+        // Initialize
+        function init() {
+            renderCidades();
+            renderRotas();
+            renderInstituicoes();
+            updateStats();
+        }
+
+        // Render Cidades
+        function renderCidades() {
+            const container = document.getElementById('cidadesGroup');
+            container.innerHTML = '';
+            Object.keys(rotasData).forEach(cidade => {
+                const btn = document.createElement('button');
+                btn.className = `btn ${selectedCidade === cidade ? 'active' : ''}`;
+                btn.textContent = cidade;
+                btn.onclick = () => {
+                    selectedCidade = cidade;
+                    selectedRota = Object.keys(rotasData[cidade])[0];
+                    renderCidades();
+                    renderRotas();
+                    renderInstituicoes();
+                    updateStats();
+                    document.getElementById('searchInput').value = '';
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // Render Rotas
+        function renderRotas() {
+            const container = document.getElementById('rotasGroup');
+            container.innerHTML = '';
+            const rotas = Object.keys(rotasData[selectedCidade] || {});
+            rotas.forEach(rota => {
+                const btn = document.createElement('button');
+                btn.className = `btn ${selectedRota === rota ? 'active magenta' : ''}`;
+                btn.textContent = rota;
+                btn.onclick = () => {
+                    selectedRota = rota;
+                    renderRotas();
+                    renderInstituicoes();
+                    updateStats();
+                    document.getElementById('searchInput').value = '';
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // Render Instituições
+        function renderInstituicoes() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const instituicoes = rotasData[selectedCidade][selectedRota] || [];
+            const filtered = instituicoes.filter(inst =>
+                inst.instituicao.toLowerCase().includes(searchTerm) ||
+                inst.bairro.toLowerCase().includes(searchTerm)
+            );
+
+            const container = document.getElementById('instituicoesList');
+            container.innerHTML = '';
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state">🔍 Nenhuma instituição encontrada</div>';
+                document.getElementById('resultados').textContent = '0';
+                document.getElementById('totalResultados').textContent = instituicoes.length;
+                return;
+            }
+
+            filtered.forEach(inst => {
+                const card = document.createElement('a');
+                card.href = inst.link;
+                card.target = '_blank';
+                card.rel = 'noopener noreferrer';
+                card.className = 'instituicao-card';
+                card.innerHTML = `
+                    <div class="instituicao-info">
+                        <div class="instituicao-id">ID: ${String(inst.id).padStart(3, '0')}</div>
+                        <div class="instituicao-nome">${inst.instituicao}</div>
+                        <div class="instituicao-bairro">📍 ${inst.bairro}</div>
+                    </div>
+                    <div class="instituicao-arrow">→</div>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('resultados').textContent = filtered.length;
+            document.getElementById('totalResultados').textContent = instituicoes.length;
+        }
+
+        // Update Stats
+        function updateStats() {
+            const statsContainer = document.getElementById('statsContainer');
+            const cidades = Object.keys(rotasData).length;
+            const rotas = Object.keys(rotasData[selectedCidade] || {}).length;
+            const instituicoes = (rotasData[selectedCidade][selectedRota] || []).length;
+
+            statsContainer.innerHTML = `
+                <div class="stats-item">Cidades: ${cidades}</div>
+                <div class="stats-item">Rotas: ${rotas}</div>
+                <div class="stats-item">Instituições: ${instituicoes}</div>
+            `;
+
+            document.getElementById('rotaSelecionada').textContent = selectedRota;
+            document.getElementById('cidadeSelecionada').textContent = selectedCidade;
+        }
+
+        // Search Event
+        document.getElementById('searchInput').addEventListener('input', renderInstituicoes);
+
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
 </body>
 </html>
